@@ -27,7 +27,8 @@ def gerar_relatorio():
     veiculos_labels = [veiculo.tipo for veiculo in veiculos]
     veiculos_data = [sum(registro.quantidade for viagem in viagens for registro in viagem.registros if registro.veiculo_id == veiculo.id) for veiculo in veiculos]
 
-    viagens_labels = [f"{viagem.data_hora} - {viagem.balsa.nome}" for viagem in viagens]
+    # Formata os rótulos para o gráfico "Viagens por Data / Balsa / Veículos"
+    viagens_labels = [f"{viagem.data_hora.strftime('%Y-%m-%d')} | {viagem.balsa.nome}" for viagem in viagens]
     viagens_data = [viagem.quantidade_veiculos for viagem in viagens]
 
     return render_template('gerar_relatorio.html', 
@@ -63,6 +64,7 @@ def exportar_excel():
     buffer.seek(0)
 
     return send_file(buffer, as_attachment=True, download_name="relatorio_viagens.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
 
 @relatorio_bp.route('/relatorios/exportar_pdf', methods=['POST'])
@@ -111,8 +113,8 @@ def exportar_pdf():
     p.drawImage(tmp_veiculo_path, 250, y - 120, width=150, height=120)
 
     # Gráfico de Viagens por Data / Balsa / Veículos
-    p.drawString(450, y, "Viagens por Data / Balsa / Veículos")
-    p.drawImage(tmp_viagens_path, 450, y - 120, width=150, height=120)
+    p.drawString(450, y, "Viagens por Balsa")
+    p.drawImage(tmp_viagens_path, 450, y - 120, width=150, height=120)  # Reduzido para caber na página
 
     y -= 140  # Espaçamento após os gráficos
 
