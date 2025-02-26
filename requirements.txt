@@ -1,0 +1,7 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.5
+Flask-Migrate==4.0.4
+openpyxl==3.1.2
+reportlab==4.0.4
+pillow>=9.0.0
+#npm install chartjs-plugin-datalabels

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Balsas</h2>
+<ul>
+    {% for balsa in balsas %}
+    <li>{{ balsa.nome }} - Capacidade: {{ balsa.capacidade_maxima }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

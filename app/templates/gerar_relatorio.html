@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Relatório de Viagens</h2>
+
+<!-- Gráficos -->
+<div class="row">
+    <div class="col-md-4">
+        <h4>Quantidades por Balsa</h4>
+        <canvas id="graficoBalsas"></canvas>
+    </div>
+    <div class="col-md-4">
+        <h4>Viagens por Veículos</h4>
+        <canvas id="graficoVeiculos"></canvas>
+    </div>
+    <div class="col-md-4">
+        <h4>Viagens por Data / Balsa / Veículos</h4>
+        <canvas id="graficoViagens"></canvas>
+    </div>
+</div>
+
+<!-- Listagem de Viagens -->
+<h3 class="mt-4">Listagem de Viagens</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Balsa</th>
+            <th>Data e Hora</th>
+            <th>Veículos</th>
+            <th>Total de Veículos</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for viagem in viagens %}
+        <tr>
+            <td>{{ viagem.id }}</td>
+            <td>{{ viagem.balsa.nome }}</td>
+            <td>{{ viagem.data_hora }}</td>
+            <td>
+                <ul>
+                    {% for registro in viagem.registros %}
+                    <li>{{ registro.veiculo.tipo }}: {{ registro.quantidade }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ viagem.quantidade_veiculos }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5">Nenhuma viagem cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Botões de Exportação -->
+<div class="mt-4">
+    <a href="{{ url_for('relatorio.exportar_excel') }}" class="btn btn-success">Exportar para Excel</a>
+    <button onclick="exportarPDF()" class="btn btn-danger">Exportar para PDF</button>
+</div>
+
+<!-- Chart.js e Plugins -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+    // Registra o plugin de datalabels
+    Chart.register(ChartDataLabels);
+
+    // Gráfico de Quantidades por Balsa
+    const ctxBalsas = document.getElementById('graficoBalsas').getContext('2d');
+    new Chart(ctxBalsas, {
+        type: 'pie',
+        data: {
+            labels: {{ balsas_labels | tojson }},
+            datasets: [{
+                label: 'Quantidades por Balsa',
+                data: {{ balsas_data | tojson }},
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    formatter: (value) => value,
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Viagens por Veículos
+    const ctxVeiculos = document.getElementById('graficoVeiculos').getContext('2d');
+    new Chart(ctxVeiculos, {
+        type: 'pie',
+        data: {
+            labels: {{ veiculos_labels | tojson }},
+            datasets: [{
+                label: 'Viagens por Veículos',
+                data: {{ veiculos_data | tojson }},
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        },
+        options: {
+            plugins: {
+                datalabels: {
+                    formatter: (value) => value,
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de Viagens por Data / Balsa / Veículos
+    const ctxViagens = document.getElementById('graficoViagens').getContext('2d');
+    new Chart(ctxViagens, {
+        type: 'bar',
+        data: {
+            labels: {{ viagens_labels | tojson }},
+            datasets: [{
+                label: 'Viagens por Data / Balsa / Veículos',
+                data: {{ viagens_data | tojson }},
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                datalabels: {
+                    formatter: (value) => value,
+                    color: '#000',
+                    font: {
+                        weight: 'bold',
+                        size: 12
+                    }
+                }
+            }
+        }
+    });
+
+    // Função para exportar PDF
+    function exportarPDF() {
+        // Captura os gráficos como imagens
+        html2canvas(document.querySelector("#graficoBalsas")).then(canvas => {
+            const balsaImg = canvas.toDataURL('image/png');
+            html2canvas(document.querySelector("#graficoVeiculos")).then(canvas => {
+                const veiculoImg = canvas.toDataURL('image/png');
+                html2canvas(document.querySelector("#graficoViagens")).then(canvas => {
+                    const viagensImg = canvas.toDataURL('image/png');
+
+                    // Envia as imagens para o servidor
+                    fetch('/relatorios/exportar_pdf', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ balsaImg, veiculoImg, viagensImg })
+                    }).then(response => response.blob())
+                      .then(blob => {
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'relatorio_viagens.pdf';
+                          a.click();
+                      });
+                });
+            });
+        });
+    }
+</script>
+{% endblock %}

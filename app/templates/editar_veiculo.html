@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar Veículo</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="tipo" class="form-label">Tipo</label>
+        <input type="text" class="form-control" id="tipo" name="tipo" value="{{ veiculo.tipo }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="peso_medio" class="form-label">Peso Médio</label>
+        <input type="number" class="form-control" id="peso_medio" name="peso_medio" value="{{ veiculo.peso_medio }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{{ url_for('veiculo.cadastrar_veiculo') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Editar Balsa</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" name="nome" value="{{ balsa.nome }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="capacidade_maxima" class="form-label">Capacidade Máxima</label>
+        <input type="number" class="form-control" id="capacidade_maxima" name="capacidade_maxima" value="{{ balsa.capacidade_maxima }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{{ url_for('balsa.cadastrar_balsa') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

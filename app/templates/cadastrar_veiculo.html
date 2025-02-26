@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Cadastrar Veículo</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="tipo" class="form-label">Tipo</label>
+        <input type="text" class="form-control" id="tipo" name="tipo" required>
+    </div>
+    <div class="mb-3">
+        <label for="peso_medio" class="form-label">Peso Médio</label>
+        <input type="number" class="form-control" id="peso_medio" name="peso_medio" required>
+    </div>
+    <button type="submit" class="btn btn-success">Cadastrar</button>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Voltar</a>
+</form>
+
+<hr>
+
+<h3>Veículos Cadastrados</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Peso Médio</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for veiculo in veiculos %}
+        <tr>
+            <td>{{ veiculo.id }}</td>
+            <td>{{ veiculo.tipo }}</td>
+            <td>{{ veiculo.peso_medio }}</td>
+            <td>
+                <a href="{{ url_for('veiculo.editar_veiculo', id=veiculo.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('veiculo.excluir_veiculo', id=veiculo.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

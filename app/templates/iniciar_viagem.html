@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Iniciar Viagem</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="balsa_id" class="form-label">Balsa</label>
+        <select class="form-control" id="balsa_id" name="balsa_id" required>
+            {% for balsa in balsas %}
+            <option value="{{ balsa.id }}">{{ balsa.nome }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="data_hora" class="form-label">Data e Hora</label>
+        <input type="datetime-local" class="form-control" id="data_hora" name="data_hora" required>
+    </div>
+
+    <h4>Veículos</h4>
+    {% for veiculo in veiculos %}
+    <div class="mb-3">
+        <label for="veiculo_{{ veiculo.id }}" class="form-label" style="display: inline-block; width: 100px;">{{ veiculo.tipo }}</label>
+        <input type="number" class="form-control" id="veiculo_{{ veiculo.id }}" name="veiculo_{{ veiculo.id }}" value="0" min="0" style="width: 100px; display: inline-block;">
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-warning">Iniciar Viagem</button>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Voltar</a>
+</form>
+
+<hr>
+
+<h3>Viagens Cadastradas</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Balsa</th>
+            <th>Data e Hora</th>
+            <th>Veículos</th>
+            <th>Total de Veículos</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for viagem in viagens %}
+        <tr>
+            <td>{{ viagem.id }}</td>
+            <td>{{ viagem.balsa.nome }}</td>
+            <td>{{ viagem.data_hora }}</td>
+            <td>
+                <ul>
+                    {% for registro in viagem.registros %}
+                    <li>{{ registro.veiculo.tipo }}: {{ registro.quantidade }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ viagem.quantidade_veiculos }}</td>
+            <td>
+                <a href="{{ url_for('viagem.editar_viagem', id=viagem.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('viagem.excluir_viagem', id=viagem.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">Nenhuma viagem cadastrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

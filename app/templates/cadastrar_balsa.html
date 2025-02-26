@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Cadastrar Balsa</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="nome" class="form-label">Nome</label>
+        <input type="text" class="form-control" id="nome" name="nome" required>
+    </div>
+    <div class="mb-3">
+        <label for="capacidade_maxima" class="form-label">Capacidade Máxima</label>
+        <input type="number" class="form-control" id="capacidade_maxima" name="capacidade_maxima" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Cadastrar</button>
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Voltar</a>
+</form>
+
+<hr>
+
+<h3>Balsas Cadastradas</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Capacidade Máxima</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for balsa in balsas %}
+        <tr>
+            <td>{{ balsa.id }}</td>
+            <td>{{ balsa.nome }}</td>
+            <td>{{ balsa.capacidade_maxima }}</td>
+            <td>
+                <a href="{{ url_for('balsa.editar_balsa', id=balsa.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('balsa.excluir_balsa', id=balsa.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
